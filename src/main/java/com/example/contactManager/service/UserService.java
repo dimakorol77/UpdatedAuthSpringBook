@@ -17,12 +17,22 @@ public class UserService {
     private UserRepository userRepository;
 
     public User register(RegisterRequestDto request) {
+        // Проверяем, существует ли уже пользователь с таким email
+        Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
+        if (existingUser.isPresent()) {
+            throw new RuntimeException("User with this email already exists");
+        }
+
+        // Если пользователь с таким email не найден, создаем нового
         User user = new User();
         user.setEmail(request.getEmail());
         user.setPassword(request.getPassword()); // Пароль должен быть захеширован
         user.setName(request.getName());
+
+        // Сохраняем нового пользователя в базе данных
         return userRepository.save(user);
     }
+
 
     public LoginResponseDto login(LoginRequestDto request) {
         Optional<User> userOptional = userRepository.findByEmail(request.getEmail());
@@ -30,7 +40,7 @@ public class UserService {
             String token = generateToken(userOptional.get());
             return new LoginResponseDto(request.getEmail(), token);
         }
-        throw new RuntimeException("Invalid credentials");
+        throw new RuntimeException("Invalid Login or Password");
     }
 
     private String generateToken(User user) {
