@@ -27,3 +27,5 @@ public class AuthController {
         return ResponseEntity.ok(userService.login(request));
     }
 }
+//001{user@example.com|strongPassword123}
+//001{newuser@example.com|newStrongPassword123}

@@ -3,11 +3,15 @@ package com.example.contactManager.repository;
 import com.example.contactManager.model.Contact;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.http.HttpStatus;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
+
 @Primary
 @Repository
 public class JdbsContactRepository implements ContactRepository {
@@ -57,7 +61,17 @@ public class JdbsContactRepository implements ContactRepository {
 
     @Override
     public void deleteById(Integer id) {
-        String sql = "DELETE FROM contacts WHERE id = ?";
-        jdbcTemplate.update(sql, id);
+        String checkSql = "SELECT COUNT(*) FROM contacts WHERE id = ?";
+        Integer count = jdbcTemplate.queryForObject(checkSql, new Object[]{id}, Integer.class);
+
+        if (count != null && count > 0) {
+            String deleteSql = "DELETE FROM contacts WHERE id = ?";
+            jdbcTemplate.update(deleteSql, id);
+        } else {
+            throw new NoSuchElementException("Contact with id " + id + " not found.");
+        }
     }
+
+
+
 }
