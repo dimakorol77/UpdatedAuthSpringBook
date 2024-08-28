@@ -17,20 +17,20 @@ public class UserService {
     private UserRepository userRepository;
 
     public User register(RegisterRequestDto request) {
-        // Проверяем, существует ли уже пользователь с таким email
-        Optional<User> existingUser = userRepository.findByEmail(request.getEmail());
+      //Проверка на то существует ли уже пользователь с таким email
+        Optional <User> existingUser= userRepository.findByEmail(request.getEmail());
         if (existingUser.isPresent()) {
-            throw new RuntimeException("User with this email already exists");
+            throw  new RuntimeException("User with this email already exists");
         }
-
-        // Если пользователь с таким email не найден, создаем нового
+        //Если пользователь с таким email не найден, то создаем нового
         User user = new User();
         user.setEmail(request.getEmail());
-        user.setPassword(request.getPassword()); // Пароль должен быть захеширован
         user.setName(request.getName());
+        user.setPassword(request.getPassword());
+        user.setRole("ROLE_USER");
 
-        // Сохраняем нового пользователя в базе данных
-        return userRepository.save(user);
+        //сохраняем пользователя
+        return  userRepository.save(user);
     }
 
 
@@ -56,4 +56,20 @@ public class UserService {
         }
         return Optional.empty();
     }
+    public void updateUserRole(Long userId, String role ) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        user.setRole(role);
+        userRepository.save(user);
+    }
+
+
+
+
+
+
+
+
+
+
 }

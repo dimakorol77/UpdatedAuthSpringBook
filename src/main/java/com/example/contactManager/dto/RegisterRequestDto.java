@@ -18,4 +18,8 @@ public class RegisterRequestDto {
 
     @NotBlank
     private String name;
+
+    @NotBlank
+    private String role;
+
 }
